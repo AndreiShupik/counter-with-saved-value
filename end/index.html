@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="page">
+
+        <div class="counter">
+            <button data-action="decrease" class="counter__button">-</button>
+            <span class="counter__value">0</span>
+            <button data-action="increase" class="counter__button">+</button>
+        </div>
+    </div>
+    <script>
+        const counterElem = document.querySelector('.counter')
+        const counterValueElem = document.querySelector('.counter__value')
+
+        const onCounterChange = event => {
+            const isButton = event.target.classList.contains('counter__button')
+
+            if (!isButton) {
+                return
+            }
+            const action = event.target.dataset.action // заносим в action значение действия элемента (increase или decrease)
+            const oldValue = Number(counterValueElem.textContent) // переводим текущее значение счетчика из строки в число
+            const newValue = action === 'decrease' // в зависимости от значения action
+                ?
+                oldValue - 1 // уменьшаем или
+                :
+                oldValue + 1 // увеличиваем
+
+            localStorage.setItem('counterValue', newValue) // заносим в локальное хранилище значение newValue под ключем counterValue
+            counterValueElem.textContent = newValue // меняем текущее значение DOM-элемента счетчика
+        }
+
+        counterElem.addEventListener('click', onCounterChange) // случшаем клики
+
+        const onStorageChange = event => { // создаем call-back функцию, которая каким-то образом реагирует на соыбтие storage
+            console.log(event)
+            counterValueElem.textContent = event.newValue
+        }
+        window.addEventListener('storage', onStorageChange) // слушаем событие изменения локального хранилища storage и вызываем callback-функцию
+
+        const onDocumentLoaded = () => { // callback-функция, которая срабатывает при загрузке страницы
+            counterValueElem.textContent = localStorage.getItem('counterValue') || 0 // автоматически подставляет данные с прошлого сеанса
+                // или, если сеанс первый, возвращает 0
+        }
+
+        document.addEventListener('DOMContentLoaded', onDocumentLoaded) // слушаем событие загрузки DOM-дерева страницы и вызываем функцию
+    </script>
+</body>
+
+</html>
